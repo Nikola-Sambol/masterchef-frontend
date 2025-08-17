@@ -39,7 +39,7 @@ const RecipeCard = () => {
     const [searchTerm, setSearchTerm] = useState("");
 
     const [page, setPage] = useState(0);
-    const [size] = useState(3);
+    const [size] = useState(6);
     const [totalPages, setTotalPages] = useState(0);
 
     const { token } = useMyContext();

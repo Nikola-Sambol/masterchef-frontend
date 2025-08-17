@@ -66,7 +66,7 @@ const ChangePasswordModal = ({ id, onClose, isAdmin = false }: Props) => {
                                 className="absolute right-2 top-2 text-gray-600"
                                 onClick={() => setShowOldPassword(!showOldPassword)}
                             >
-                                {showOldPassword ? "🙈" : "👁️"}
+                                {showOldPassword ? <IoEyeOff size={20}/> : <IoEye size={20}/>}
                             </button>
                         </div>
                         {errors.oldPassword && (

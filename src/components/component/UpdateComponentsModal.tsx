@@ -238,7 +238,7 @@ const UpdateComponentsModal = ({ onClose }: Props) => {
                     {comp.imagePath && !comp.deleteImage && (
                         <div className="mb-4">
                             <img
-                                src={`http://localhost:8080/api/${comp.imagePath}`}
+                                src={`data:image/png;base64,${comp.imagePath}`}
                                 alt="Trenutna slika"
                                 className="w-32 h-auto rounded mb-2"
                             />

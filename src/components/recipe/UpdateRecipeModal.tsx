@@ -1,6 +1,6 @@
 // src/components/UpdateRecipeModal.tsx
 import { useEffect, useState } from "react";
-import {type FieldValues, type SubmitHandler, useForm} from "react-hook-form";
+import { type FieldValues, type SubmitHandler, useForm } from "react-hook-form";
 import Select from "react-select";
 import api from "../../axios/api.ts";
 import toast from "react-hot-toast";
@@ -20,8 +20,8 @@ const UpdateRecipeModal = ({ id, onClose }: Props) => {
         recipeName: string;
         preparationTime: string;
         category: Category;
-        imagePath: string;
-        videoPath?: string;
+        image: string;   // base64
+        video?: string;  // base64
     }
 
     interface OptionType {
@@ -83,11 +83,11 @@ const UpdateRecipeModal = ({ id, onClose }: Props) => {
         formData.append("name", data.name);
         formData.append("preparationTime", data.preparationTime);
 
-        if (data.image[0]) {
+        if (data.image && data.image[0]) {
             formData.append("image", data.image[0]);
         }
 
-        if (data.video[0]) {
+        if (data.video && data.video[0]) {
             formData.append("video", data.video[0]);
         }
 
@@ -126,13 +126,20 @@ const UpdateRecipeModal = ({ id, onClose }: Props) => {
             <label className="block mb-2 font-semibold">Naziv recepta</label>
             <input
                 type="text"
-                {...register("name", { required: "Naziv je obavezan." , minLength: {
+                {...register("name", {
+                    required: "Naziv je obavezan.",
+                    minLength: {
                         value: 3,
                         message: "Naziv mora imati najmanje 3 karaktera!",
-                    }, })}
+                    },
+                })}
                 className="w-full border border-gray-300 rounded px-3 py-2 mb-1"
             />
-            {errors.name && <p className="text-red-500 text-sm mb-3">{errors.name.message?.toString()}</p>}
+            {errors.name && (
+                <p className="text-red-500 text-sm mb-3">
+                    {errors.name.message?.toString()}
+                </p>
+            )}
 
             <label className="block mb-2 font-semibold">Nova slika (opcionalno)</label>
             <input
@@ -141,11 +148,13 @@ const UpdateRecipeModal = ({ id, onClose }: Props) => {
                 className="mb-4"
                 accept="image/png, image/jpeg, image/jpg"
             />
-            <img
-                src={`${import.meta.env.VITE_API_URL}/${recipe.imagePath}`}
-                alt="Trenutna slika"
-                className="w-32 h-auto rounded mb-4"
-            />
+            {recipe.image && (
+                <img
+                    src={`data:image/png;base64,${recipe.image}`}
+                    alt="Trenutna slika"
+                    className="w-32 h-auto rounded mb-4"
+                />
+            )}
 
             <label className="block mb-2 font-semibold">Video pripreme (opcionalno)</label>
             <input
@@ -154,10 +163,10 @@ const UpdateRecipeModal = ({ id, onClose }: Props) => {
                 className="mb-2"
                 accept="video/mp4, video/webm"
             />
-            {recipe.videoPath && !deleteVideo && (
+            {recipe.video && !deleteVideo && (
                 <div className="mb-4">
                     <video controls className="w-64 h-40 rounded mb-2">
-                        <source src={`http://localhost:8080/api/${recipe.videoPath}`} />
+                        <source src={`data:video/mp4;base64,${recipe.video}`} />
                     </video>
                     <button
                         type="button"
@@ -173,14 +182,19 @@ const UpdateRecipeModal = ({ id, onClose }: Props) => {
             <label className="block mb-2 font-semibold">Vrijeme pripreme</label>
             <input
                 type="text"
-                {...register("preparationTime", { required: "Vrijeme pripreme je obavezno.", minLength: {
+                {...register("preparationTime", {
+                    required: "Vrijeme pripreme je obavezno.",
+                    minLength: {
                         value: 2,
                         message: "Vrijeme pripreme mora imati najmanje 2 karaktera!",
-                    }, })}
+                    },
+                })}
                 className="w-full border border-gray-300 rounded px-3 py-2 mb-1"
             />
             {errors.preparationTime && (
-                <p className="text-red-500 text-sm mb-3">{errors.preparationTime.message?.toString()}</p>
+                <p className="text-red-500 text-sm mb-3">
+                    {errors.preparationTime.message?.toString()}
+                </p>
             )}
 
             <label className="block mb-2 font-semibold">Kategorija</label>
@@ -188,21 +202,28 @@ const UpdateRecipeModal = ({ id, onClose }: Props) => {
                 options={options}
                 value={
                     selectedCategory
-                        ? options.find(opt => opt.value === selectedCategory.id)
+                        ? options.find((opt) => opt.value === selectedCategory.id)
                         : null
                 }
                 onChange={(opt) => {
-                    const selected = categories.find(c => c.id === opt?.value);
+                    const selected = categories.find((c) => c.id === opt?.value);
                     if (selected) setSelectedCategory(selected);
                 }}
                 className="mb-6"
             />
 
             <div className="flex justify-end gap-4">
-                <button type="button" onClick={onClose} className="bg-gray-300 px-4 py-2 rounded">
+                <button
+                    type="button"
+                    onClick={onClose}
+                    className="bg-gray-300 px-4 py-2 rounded"
+                >
                     Odustani
                 </button>
-                <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
+                <button
+                    type="submit"
+                    className="bg-blue-600 text-white px-4 py-2 rounded"
+                >
                     Spremi
                 </button>
             </div>

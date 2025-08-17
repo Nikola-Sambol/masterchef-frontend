@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import api from "../../axios/api.ts";
-import {Link, useNavigate, useSearchParams} from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import FloatingActionButton from "../../utils/FloatingActionButton.tsx";
 import { useMyContext } from "../../context/AuthContext.tsx";
 import { IoIosArrowBack, IoIosArrowForward, IoMdAddCircle } from "react-icons/io";
@@ -15,8 +15,7 @@ type Recipe = {
     id: number;
     recipeName: string;
     creationDate: string;
-    imagePath: string;
-    videoPath: string;
+    image: string | null;   // base64 string dolazi s backenda
     preparationTime: string;
     components: null;
     category: null;
@@ -36,8 +35,8 @@ const RecipeCard = () => {
     const [categories, setCategories] = useState<Category[]>([]);
     const [categoryId, setCategoryId] = useState<number | null>(null);
 
-    const [searchInput, setSearchInput] = useState(""); // što korisnik trenutno tipka
-    const [searchTerm, setSearchTerm] = useState(""); // što backend zapravo pretražuje
+    const [searchInput, setSearchInput] = useState("");
+    const [searchTerm, setSearchTerm] = useState("");
 
     const [page, setPage] = useState(0);
     const [size] = useState(6);
@@ -49,7 +48,6 @@ const RecipeCard = () => {
     const [searchParams] = useSearchParams();
     const searchQuery = searchParams.get("q") || "";
 
-
     const actions = [];
     if (token) {
         actions.push({
@@ -60,6 +58,20 @@ const RecipeCard = () => {
             onClick: () => navigate("/addrecipe"),
         });
     }
+
+    // Dodaj ovaj skeleton komponentu u RecipeCard.tsx
+
+    const RecipeSkeleton = () => (
+        <div className="flex flex-col bg-gray-200 animate-pulse rounded-lg shadow-sm">
+            <div className="w-full h-48 bg-gray-300 rounded-t-lg"></div>
+            <div className="p-4 space-y-2">
+                <div className="h-6 bg-gray-300 rounded w-3/4"></div>
+                <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+                <div className="h-4 bg-gray-300 rounded w-2/3"></div>
+            </div>
+        </div>
+    );
+
 
     // Dohvat kategorija
     useEffect(() => {
@@ -75,8 +87,8 @@ const RecipeCard = () => {
     }, []);
 
     useEffect(() => {
-        setSearchTerm(searchQuery);  // sinkroniziraj searchTerm s query iz URL-a
-        setPage(0); // ako želiš reset paginacije na novu pretragu
+        setSearchTerm(searchQuery);
+        setPage(0);
     }, [searchQuery]);
 
     // Dohvat recepata
@@ -95,7 +107,7 @@ const RecipeCard = () => {
                 setRecipes(response.data.content);
                 setTotalPages(response.data.totalPages);
             } catch {
-                toast.error("Nije moguce dohvatiti recepte");
+                toast.error("Nije moguće dohvatiti recepte");
             } finally {
                 setLoading(false);
             }
@@ -103,7 +115,6 @@ const RecipeCard = () => {
         fetchRecipes();
     }, [page, size, categoryId, searchTerm]);
 
-    // Format datuma
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
         const day = String(date.getDate()).padStart(2, "0");
@@ -112,13 +123,21 @@ const RecipeCard = () => {
         return `${day}.${month}.${year}`;
     };
 
-    // Pokreni pretragu
     const handleSearch = () => {
         setSearchTerm(searchInput.trim());
         setPage(0);
     };
 
-    if (loading) return <p>Učitavanje recepata...</p>;
+    if (loading) {
+        return (
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 w-full max-w-7xl mx-auto px-5 py-6 place-items-stretch">
+                {Array.from({ length: 6 }).map((_, i) => (
+                    <RecipeSkeleton key={i} />
+                ))}
+            </div>
+        );
+    }
+
     if (error) return <p>Greška: {error}</p>;
 
     return (
@@ -170,11 +189,18 @@ const RecipeCard = () => {
                         to={`/recipedetails/${recipe.id}`}
                         className="flex flex-col bg-[#BAE0FF] border border-gray-200 rounded-lg shadow-sm hover:bg-blue-300 hover:shadow-lg transition-transform hover:-translate-y-1"
                     >
-                        <img
-                            className="w-full h-48 object-cover rounded-t-lg"
-                            src={`${import.meta.env.VITE_API_URL}/${recipe.imagePath}`}
-                            alt={recipe.recipeName}
-                        />
+                        {recipe.image ? (
+                            <img
+                                className="w-full h-48 object-cover rounded-t-lg"
+                                src={`data:image/jpeg;base64,${recipe.image}`}
+                                alt={recipe.recipeName}
+                            />
+                        ) : (
+                            <div className="w-full h-48 flex items-center justify-center bg-gray-300 rounded-t-lg">
+                                <span className="text-gray-600">Nema slike</span>
+                            </div>
+                        )}
+
                         <div className="p-4 text-left">
                             <h5 className="mb-2 text-2xl font-bold tracking-tight text-black">
                                 {recipe.recipeName}

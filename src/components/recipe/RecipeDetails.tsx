@@ -51,8 +51,8 @@ const RecipeDetails = () => {
         id: number;
         recipeName: string;
         creationDate: string;
-        imagePath: string;
-        videoPath: string;
+        image: string;
+        video: string;
         preparationTime: string;
         components: ComponentDTO[];
         category: CategoryDTO;
@@ -182,19 +182,22 @@ const RecipeDetails = () => {
                 {/* Flex container za sliku i video */}
                 <div className="flex flex-col md:flex-row gap-4 p-6">
                     <img
-                        src={`${import.meta.env.VITE_API_URL}/${recipe.imagePath}`}
+                        src={`data:image/png;base64,${recipe.image}`} // ako backend šalje base64
                         alt={recipe.recipeName}
                         className="w-full md:w-2/5 h-auto object-cover rounded-md"
                         style={{ maxHeight: "300px" }}
                     />
 
-                    {recipe.videoPath && (
+
+                    {recipe.video && (
                         <video
-                            src={`http://localhost:8080/api/${recipe.videoPath}`}
                             controls
                             className="w-full md:w-3/5 rounded-md"
                             style={{ maxHeight: "300px", objectFit: "cover" }}
-                        />
+                        >
+                            <source src={`data:video/mp4;base64,${recipe.video}`} type="video/mp4" />
+                            Your browser does not support the video tag.
+                        </video>
                     )}
                 </div>
 
@@ -214,10 +217,12 @@ const RecipeDetails = () => {
 
                             {comp.imagePath && (
                                 <img
-                                    src={`http://localhost:8080/api/${comp.imagePath}`}
-                                    alt={comp.componentName}
-                                    className="w-full md:w-1/2 rounded-md object-cover mb-4"
+                                    src={`data:image/png;base64,${comp.imagePath}`} // ako backend šalje base64
+                                    alt={recipe.recipeName}
+                                    className="w-full md:w-2/5 h-auto object-cover rounded-md"
+                                    style={{ maxHeight: "300px" }}
                                 />
+
                             )}
 
                             <div className="mb-4">

@@ -182,7 +182,7 @@ const RecipeDetails = () => {
                 {/* Flex container za sliku i video */}
                 <div className="flex flex-col md:flex-row gap-4 p-6">
                     <img
-                        src={`http://localhost:8080/api/${recipe.imagePath}`}
+                        src={`${import.meta.env.VITE_API_URL}/${recipe.imagePath}`}
                         alt={recipe.recipeName}
                         className="w-full md:w-2/5 h-auto object-cover rounded-md"
                         style={{ maxHeight: "300px" }}

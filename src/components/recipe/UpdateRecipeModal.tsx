@@ -142,7 +142,7 @@ const UpdateRecipeModal = ({ id, onClose }: Props) => {
                 accept="image/png, image/jpeg, image/jpg"
             />
             <img
-                src={`http://localhost:8080/api/${recipe.imagePath}`}
+                src={`${import.meta.env.VITE_API_URL}/${recipe.imagePath}`}
                 alt="Trenutna slika"
                 className="w-32 h-auto rounded mb-4"
             />

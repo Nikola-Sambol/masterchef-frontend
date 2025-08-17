@@ -172,7 +172,7 @@ const RecipeCard = () => {
                     >
                         <img
                             className="w-full h-48 object-cover rounded-t-lg"
-                            src={`http://localhost:8080/api/${recipe.imagePath}`}
+                            src={`${import.meta.env.VITE_API_URL}/${recipe.imagePath}`}
                             alt={recipe.recipeName}
                         />
                         <div className="p-4 text-left">
